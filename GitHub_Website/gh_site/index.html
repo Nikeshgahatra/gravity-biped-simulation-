@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gravity-Adaptive Biped Simulation</title>
+<meta name="description" content="Replay of a gravity-adaptive gait controller for a six-joint biped on Earth, the Moon and Mars. Bachelor thesis project by Nikesh Gahatraj.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Bachelor thesis · Smart Computing · Kyungdong University Global</p>
+    <h1>Gravity-adaptive gait for a bipedal robot</h1>
+    <p class="lead">A six-joint biped walks under Earth, lunar and Martian gravity. Pick a run below and watch what the simulation recorded.</p>
+    <p class="byline">Nikesh Gahatraj · ID 2317390 · Supervisor: Dr. Nyrod Villa</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="viewer" class="card">
+    <h2>Simulation replay</h2>
+    <div class="controls">
+      <label>Gravity
+        <select id="env"><option>Earth</option><option selected>Moon</option><option>Mars</option></select>
+      </label>
+      <label>Controller
+        <select id="ctl"><option value="Fixed">Fixed frequency</option><option value="Adaptive" selected>Gravity-adaptive</option></select>
+      </label>
+      <label>Gait
+        <select id="gait"><option value="tuned" selected>Tuned gait</option><option value="first">First gait (falls)</option></select>
+      </label>
+      <label>Speed
+        <select id="spd"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select>
+      </label>
+    </div>
+    <div class="stage">
+      <canvas id="cv" width="960" height="420" aria-label="Side view of the simulated biped"></canvas>
+      <div class="hud">
+        <div><span>Gravity</span><b id="hg">–</b></div>
+        <div><span>Gait frequency</span><b id="hf">–</b></div>
+        <div><span>Time</span><b id="ht">–</b></div>
+        <div><span>Distance</span><b id="hx">–</b></div>
+        <div><span>Pitch</span><b id="hp">–</b></div>
+      </div>
+      <div id="badge" class="badge" hidden></div>
+    </div>
+    <div class="bar">
+      <button id="play" type="button">Pause</button>
+      <input id="seek" type="range" min="0" max="1000" value="0" aria-label="Time">
+    </div>
+    <canvas id="chart" width="960" height="190" aria-label="Pitch, height and distance over time"></canvas>
+    <p class="note">The body position, height and tilt are the values logged by PyBullet at 0.1 s steps. The leg angles are rebuilt from the gait equations of the thesis and drawn as a flat side view, so the picture is a schematic, not a rendering of the physics engine. Both legs are shown, the far leg lighter.</p>
+  </section>
+
+  <section class="card">
+    <h2>Results of this run</h2>
+    <div id="sum" class="sum"></div>
+    <h3>All twelve runs</h3>
+    <div class="tablewrap"><table id="tbl"></table></div>
+  </section>
+
+  <section id="previous" class="card">
+    <h2>The previous project: the physical robot</h2>
+    <p>In the previous semester I built a small two-legged robot. It has a 3D-printed frame with ball bearings at the joints, six MG996R servos (hip, knee and ankle on each leg), an Arduino Mega 2560, an MPU6050 tilt sensor and a LiPo battery. The photos and the video below are from that build.</p>
+    <div class="photos">
+      <figure><img src="assets/media/robot_front.jpg" alt="Front view of the 3D-printed biped robot" loading="lazy"><figcaption>Front view: printed frame, bearings and six servos</figcaption></figure>
+      <figure><img src="assets/media/robot_side.jpg" alt="Side view of the robot with servo wiring" loading="lazy"><figcaption>Side view and servo wiring</figcaption></figure>
+      <figure><img src="assets/media/robot_electronics.jpg" alt="Arduino Mega, MPU6050 sensor and LiPo battery next to the robot" loading="lazy"><figcaption>Arduino Mega, MPU6050 sensor and LiPo battery</figcaption></figure>
+    </div>
+    <video controls muted playsinline preload="metadata" poster="assets/media/robot_moving.jpg" src="assets/media/robot_moving.mp4"></video>
+    <p class="note">The robot moving on the desk.</p>
+    <h3>Why it moves but does not walk</h3>
+    <p>All six joints bend in the same plane, so the robot cannot shift its weight sideways to lift one foot. I also estimate that the servos are close to their torque limit for a robot of this size. I could not measure either on the robot, so these are conclusions from the design and from calculation. The original Arduino code was lost, so the thesis includes a new implementation instead.</p>
+    <h3>The next robot (proposal, not built yet)</h3>
+    <p>Same six servos, new job: each ankle becomes a roll joint so the body can lean over one foot, and the leg swings while the other foot is loaded. This is a design only. It has not been tested on hardware.</p>
+    <div class="photos two-up">
+      <figure><img src="assets/media/next_robot_views.png" alt="Front and side view sketch of the proposed robot" loading="lazy"><figcaption>Proposed layout (cm, concept sketch)</figcaption></figure>
+      <figure><img src="assets/media/next_robot_sway.png" alt="Sway-walk cycle and power diagram" loading="lazy"><figcaption>Sway-walk cycle and power layout</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="card two">
+    <div>
+      <h2>What was simulated</h2>
+      <ul>
+        <li>A six-joint biped (hip, knee, ankle on each leg), 2.10 kg, in PyBullet at 240 Hz.</li>
+        <li>Motors limited to 2.0 N·m. A run ends when the body falls below 0.35 m or tilts past 45°.</li>
+        <li>Fixed controller: same gait frequency everywhere. Adaptive controller: f = f<sub>0</sub>·√(g / 9.81).</li>
+        <li>The first hand-chosen gait fell in all six runs. After a separate parameter search both controllers stayed up for 12 s.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>What this does not show</h2>
+      <ul>
+        <li>Nothing here was measured on the real robot. The prototype did not walk.</li>
+        <li>Each condition was simulated once.</li>
+        <li>The simulated motors are about twice as strong as the real servos.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="run" class="card">
+    <h2>Run the real simulation</h2>
+    <p>This page replays saved results. The physics engine runs in Python, so to run it yourself use Google Colab (no install) or your own computer.</p>
+    <p class="btns">
+      <a class="btn" id="colab" href="#" target="_blank" rel="noopener">Open in Google Colab</a>
+      <a class="btn ghost" id="repo" href="#" target="_blank" rel="noopener">View code on GitHub</a>
+    </p>
+    <pre><code>cd simulation
+pip install -r requirements.txt
+python simulate.py --gravity Moon --controller Adaptive --gait tuned --gui</code></pre>
+    <p class="note">Drop <code>--gui</code> to run without the 3D window. Results are saved as CSV files and graphs.</p>
+  </section>
+</main>
+
+<footer class="wrap foot">
+  <p>Gravity-adaptive gait control for a bipedal robot using Arduino Mega: a parametric simulation approach for Earth, lunar and Martian environments.</p>
+  <p>Data files are in the <code>data</code> folder of the repository.</p>
+</footer>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

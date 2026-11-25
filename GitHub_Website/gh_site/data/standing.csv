@@ -1,0 +1,4 @@
+environment,gravity_m_s2,max_abs_roll_deg,max_abs_pitch_deg,min_body_height_m,max_body_height_m
+Earth,9.80665,0.0364,0.0374,0.5477,0.5798
+Moon,1.62,0.0203,0.015,0.5497,0.58
+Mars,3.73,0.0221,0.0198,0.5499,0.5799
